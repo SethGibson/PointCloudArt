@@ -54,6 +54,8 @@ public:
 	};
 
 private:
+	void reset();
+
 	bool mUpdate;
 
 	vector<Particle>	mParticles;
@@ -72,12 +74,14 @@ private:
 	CameraPersp			mCamera;
 	MayaCamUI			mMayaCam;
 	mat4				mObjectRotation;
+
+
 };
 
 
 void ThermalCloudApp::setup()
 {
-	mUpdate = false;
+	mUpdate = true;
 	getWindow()->setSize(1280, 720);
 	
 	mParticles.push_back	
@@ -118,6 +122,18 @@ void ThermalCloudApp::setup()
 	gl::enableDepthWrite();
 }
 
+
+void ThermalCloudApp::reset()
+{
+	mPositions.clear();
+	mParticles.clear();
+	mCloudData->bufferData(480*360*sizeof(vec3), nullptr, GL_DYNAMIC_DRAW);
+	mCloudMesh = gl::VboMesh::create(geom::Sphere());
+	mCloudMesh->appendVbo(mCloudAttribs, mCloudData);
+	mCloudBatch->replaceVboMesh(mCloudMesh);
+}
+
+
 void ThermalCloudApp::mouseDown( MouseEvent event )
 {
 	mMayaCam.mouseDown(event.getPos());
@@ -131,7 +147,7 @@ void ThermalCloudApp::mouseDrag(MouseEvent event)
 void ThermalCloudApp::keyDown(KeyEvent event)
 {
 	if (event.getCode() == KeyEvent::KEY_SPACE)
-		mUpdate = !mUpdate;
+		reset();
 }
 
 void ThermalCloudApp::update()
